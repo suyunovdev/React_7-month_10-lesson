@@ -32,11 +32,7 @@ const Dashboard = () => {
             <Students />
           </div>
         </Content>
-        <Content style={{ margin: "0 16px" }}>
-          <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
-            <Teachers />
-          </div>
-        </Content>
+
         <Footer style={{ textAlign: "center" }}>
           Ilyos Suyunov ©2024 Created by Suyunovdev
         </Footer>

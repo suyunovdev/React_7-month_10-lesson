@@ -4,44 +4,35 @@ const initialState = {
   students: [],
 };
 
-const studentsSlice = createSlice({
+export const studentSlice = createSlice({
   name: "students",
   initialState,
   reducers: {
-    setStudents(state, action) {
+    setStudents: (state, action) => {
       state.students = action.payload;
     },
-    addStudent(state, action) {
+    addStudent: (state, action) => {
       state.students.push(action.payload);
     },
-    updateStudent(state, action) {
-      const { id, data } = action.payload;
-      const index = state.students.findIndex((student) => student.id === id);
-      if (index !== -1) {
-        state.students[index] = { ...state.students[index], ...data };
-      }
-    },
-    deleteStudent(state, action) {
-      state.students = state.students.filter(
-        (student) => student.id !== action.payload
+    updateStudent: (state, action) => {
+      const index = state.students.findIndex(
+        student => student.id === action.payload.id
       );
-    },
-    completeStudent(state, action) {
-      const { id } = action.payload;
-      const index = state.students.findIndex((student) => student.id === id);
       if (index !== -1) {
-        state.students[index].completed = true;
+        state.students[index] = {
+          ...state.students[index],
+          ...action.payload.data,
+        };
       }
+    },
+    deleteStudent: (state, action) => {
+      state.students = state.students.filter(
+        student => student.id !== action.payload
+      );
     },
   },
 });
 
-export const {
-  setStudents,
-  addStudent,
-  updateStudent,
-  deleteStudent,
-  completeStudent,
-} = studentsSlice.actions;
-
-export default studentsSlice.reducer;
+export const { setStudents, addStudent, updateStudent, deleteStudent } =
+  studentSlice.actions;
+export default studentSlice.reducer;

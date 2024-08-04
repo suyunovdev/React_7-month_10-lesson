@@ -2,87 +2,87 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Table, Button, Modal, Form, Pagination } from "react-bootstrap";
-import {
-  setStudents,
-  addStudent,
-  updateStudent,
-  deleteStudent,
-} from "../redux/studentSlice";
 import { toast } from "react-toastify";
+import {
+  setTeachers,
+  addTeacher,
+  updateTeacher,
+  deleteTeacher,
+} from "../redux/teacherSlice";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const Students = () => {
+const Teachers = () => {
   const dispatch = useDispatch();
-  const students = useSelector(state => state.students.students);
+  const teachers = useSelector(state => state.teachers.teachers);
 
   const [showModal, setShowModal] = useState(false);
-  const [editingStudent, setEditingStudent] = useState(null);
+  const [editingTeacher, setEditingTeacher] = useState(null);
   const [formValues, setFormValues] = useState({
     name: "",
     username: "",
     email: "",
     completed: false,
-    group: "", // Guruh qo‘shildi
+    level: "",
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [filterGroup, setFilterGroup] = useState(""); // Guruh filtri
+  const [filterLevel, setFilterLevel] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const studentsPerPage = 5;
+  const teachersPerPage = 5;
 
   useEffect(() => {
     axios
       .get("https://jsonplaceholder.typicode.com/users")
       .then(response => {
-        // Fake guruh ma'lumotlarini qo‘shish
-        const studentsWithGroup = response.data.map((student, index) => ({
-          ...student,
-          group: ["Group A", "Group B", "Group C"][index % 3], // Har bir studentga guruh qo‘shish
+        // Fake level data qo'shish
+        const teachersWithLevel = response.data.map((teacher, index) => ({
+          ...teacher,
+          level: ["Senior", "Middle", "Junior"][index % 3], // Har bir teacherga level qo'shish
         }));
-        dispatch(setStudents(studentsWithGroup));
-        toast.success("Students loaded successfully");
+        dispatch(setTeachers(teachersWithLevel));
+        toast.success("Teachers loaded successfully");
       })
       .catch(error => {
-        console.error("Error fetching students:", error);
-        toast.error("Failed to load students");
+        console.error("Error fetching teachers:", error);
+        toast.error("Failed to load teachers");
       });
   }, [dispatch]);
 
-  const handleShowModal = (student = null) => {
-    setEditingStudent(student);
+  const handleShowModal = (teacher = null) => {
+    setEditingTeacher(teacher);
     setFormValues(
-      student
+      teacher
         ? {
-            name: student.name,
-            username: student.username,
-            email: student.email,
-            completed: student.completed,
-            group: student.group, // Guruhni qo‘shish
+            name: teacher.name,
+            username: teacher.username,
+            email: teacher.email,
+            completed: teacher.completed,
+            level: teacher.level,
           }
-        : { name: "", username: "", email: "", completed: false, group: "" }
+        : { name: "", username: "", email: "", completed: false, level: "" }
     );
     setShowModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditingStudent(null);
+    setEditingTeacher(null);
   };
 
   const handleDelete = id => {
-    dispatch(deleteStudent(id));
-    toast.success("Student deleted successfully");
+    dispatch(deleteTeacher(id));
+    toast.success("Teacher deleted successfully");
   };
 
   const handleSubmit = event => {
     event.preventDefault();
-    if (editingStudent) {
-      dispatch(updateStudent({ id: editingStudent.id, data: formValues }));
-      toast.success("Student updated successfully");
+    if (editingTeacher) {
+      dispatch(updateTeacher({ id: editingTeacher.id, data: formValues }));
+      toast.success("Teacher updated successfully");
     } else {
-      const newStudent = { id: students.length + 1, ...formValues };
-      dispatch(addStudent(newStudent));
-      toast.success("Student added successfully");
+      const newTeacher = { id: teachers.length + 1, ...formValues };
+      dispatch(addTeacher(newTeacher));
+      toast.success("Teacher added successfully");
     }
     handleCloseModal();
   };
@@ -103,39 +103,39 @@ const Students = () => {
     setFilterStatus(event.target.value);
   };
 
-  const handleGroupFilterChange = event => {
-    setFilterGroup(event.target.value);
+  const handleLevelFilterChange = event => {
+    setFilterLevel(event.target.value);
   };
 
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name
+  const filteredTeachers = teachers.filter(teacher => {
+    const matchesSearch = teacher.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesStatus =
       filterStatus === "" ||
-      (filterStatus === "completed" && student.completed) ||
-      (filterStatus === "not_completed" && !student.completed);
-    const matchesGroup = filterGroup === "" || student.group === filterGroup;
-    return matchesSearch && matchesStatus && matchesGroup;
+      (filterStatus === "completed" && teacher.completed) ||
+      (filterStatus === "not_completed" && !teacher.completed);
+    const matchesLevel = filterLevel === "" || teacher.level === filterLevel;
+    return matchesSearch && matchesStatus && matchesLevel;
   });
 
-  const indexOfLastStudent = currentPage * studentsPerPage;
-  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
+  const indexOfLastTeacher = currentPage * teachersPerPage;
+  const indexOfFirstTeacher = indexOfLastTeacher - teachersPerPage;
+  const currentTeachers = filteredTeachers.slice(
+    indexOfFirstTeacher,
+    indexOfLastTeacher
   );
-  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+  const totalPages = Math.ceil(filteredTeachers.length / teachersPerPage);
 
   const handlePageChange = pageNumber => {
     setCurrentPage(pageNumber);
   };
 
   return (
-    <div className="container mt-4 " style={{ paddingLeft: "160px" }}>
-      <h1>Student List</h1>
+    <div className="container mt-4" style={{ paddingLeft: "160px" }}>
+      <h1>Teacher List</h1>
       <Button variant="primary" onClick={() => handleShowModal()}>
-        Add Student
+        Add Teacher
       </Button>
 
       <input
@@ -157,14 +157,14 @@ const Students = () => {
       </select>
 
       <select
-        name="groupFilter"
-        value={filterGroup}
-        onChange={handleGroupFilterChange}
+        name="levelFilter"
+        value={filterLevel}
+        onChange={handleLevelFilterChange}
         className="form-control mt-3 w-25">
-        <option value="">All Groups</option>
-        <option value="Group A">Group A</option>
-        <option value="Group B">Group B</option>
-        <option value="Group C">Group C</option>
+        <option value="">All Levels</option>
+        <option value="Senior">Senior</option>
+        <option value="Middle">Middle</option>
+        <option value="Junior">Junior</option>
       </select>
 
       <Table striped bordered hover className="mt-4">
@@ -175,28 +175,28 @@ const Students = () => {
             <th>Username</th>
             <th>Email</th>
             <th>Completed</th>
-            <th>Group</th>
+            <th>Level</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {currentStudents.map(student => (
-            <tr key={student.id}>
-              <td>{student.id}</td>
-              <td>{student.name}</td>
-              <td>{student.username}</td>
-              <td>{student.email}</td>
-              <td>{student.completed ? "✔️" : "❌"}</td>
-              <td>{student.group}</td>
+          {currentTeachers.map(teacher => (
+            <tr key={teacher.id}>
+              <td>{teacher.id}</td>
+              <td>{teacher.name}</td>
+              <td>{teacher.username}</td>
+              <td>{teacher.email}</td>
+              <td>{teacher.completed ? "✔️" : "❌"}</td>
+              <td>{teacher.level}</td>
               <td>
                 <Button
                   variant="warning"
-                  onClick={() => handleShowModal(student)}>
+                  onClick={() => handleShowModal(teacher)}>
                   Edit
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => handleDelete(student.id)}
+                  onClick={() => handleDelete(teacher.id)}
                   style={{ marginLeft: 8 }}>
                   Delete
                 </Button>
@@ -236,7 +236,7 @@ const Students = () => {
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {editingStudent ? "Edit Student" : "Add Student"}
+            {editingTeacher ? "Edit Teacher" : "Add Teacher"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -251,7 +251,7 @@ const Students = () => {
                 required
               />
             </Form.Group>
-            <Form.Group controlId="formUsername" className="mt-3">
+            <Form.Group controlId="formUsername">
               <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
@@ -261,7 +261,7 @@ const Students = () => {
                 required
               />
             </Form.Group>
-            <Form.Group controlId="formEmail" className="mt-3">
+            <Form.Group controlId="formEmail">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
@@ -271,27 +271,27 @@ const Students = () => {
                 required
               />
             </Form.Group>
-            <Form.Group controlId="formCompleted" className="mt-3">
+            <Form.Group controlId="formCompleted">
               <Form.Check
                 type="checkbox"
-                name="completed"
                 label="Completed"
+                name="completed"
                 checked={formValues.completed}
                 onChange={handleChange}
               />
             </Form.Group>
-            <Form.Group controlId="formGroup" className="mt-3">
-              <Form.Label>Group</Form.Label>
+            <Form.Group controlId="formLevel">
+              <Form.Label>Level</Form.Label>
               <Form.Control
                 type="text"
-                name="group"
-                value={formValues.group}
+                name="level"
+                value={formValues.level}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
             <Button variant="primary" type="submit" className="mt-3">
-              {editingStudent ? "Update" : "Add"}
+              {editingTeacher ? "Update" : "Add"}
             </Button>
           </Form>
         </Modal.Body>
@@ -300,4 +300,4 @@ const Students = () => {
   );
 };
 
-export default Students;
+export default Teachers;

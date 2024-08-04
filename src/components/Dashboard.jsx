@@ -24,9 +24,7 @@ const Dashboard = () => {
         </Menu>
       </Sider>
       <Layout>
-        <Header style={{ background: "#fff", padding: 0 }}>
-          {"  Student"}
-        </Header>
+        <Header />
         <Content style={{ margin: "0 16px" }}>
           <div style={{ padding: 24, background: "#fff", minHeight: 360 }}>
             <Students />

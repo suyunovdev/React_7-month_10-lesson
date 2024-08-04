@@ -20,7 +20,7 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="login-container" style={{ width: "400px" }}>
       <Form name="login" onFinish={handleLogin} className="form">
         <Form.Item
           name="username"
